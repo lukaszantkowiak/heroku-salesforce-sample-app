@@ -14,12 +14,10 @@ public class ContactsController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @RequestMapping("/1")
-    public String getContacts() {
+    @RequestMapping("/")
+    public List<Map<String, Object>> getContacts() {
         System.out.println("ContactsController.getContacts");
-        List<Map<String, Object>> maps = jdbcTemplate.queryForList("select * from salesforce.Contact");
-        System.out.println("maps = " + maps);
-        return "OK";
+        return jdbcTemplate.queryForList("select * from salesforce.Contact");
     }
 
     @RequestMapping("/2")
