@@ -19,7 +19,7 @@ public class ContactsController {
     @RequestMapping("/")
     public List<Map<String, Object>> getContacts() {
         System.out.println("ContactsController.getContacts");
-        return jdbcTemplate.queryForList("select firstname, lastname, private_email__c from salesforce.Contact");
+        return jdbcTemplate.queryForList("select firstname, lastname, private_email__c as privateemail from salesforce.Contact");
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
