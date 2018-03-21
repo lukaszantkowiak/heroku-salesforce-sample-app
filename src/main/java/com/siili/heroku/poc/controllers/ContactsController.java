@@ -54,13 +54,13 @@ public class ContactsController {
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ResponseEntity<Integer> updateContact(@RequestBody Contact contact) {
-        int update = jdbcTemplate.update(
+    public ResponseEntity<Object> updateContact(@RequestBody Contact contact) {
+        jdbcTemplate.update(
                 UPDATE_CONTACT_QUERY,
                 contact.getPrivateEmail(), contact.getFirstName(), contact.getLastName()
         );
 
-        return ResponseEntity.ok(update);
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping("/status")
