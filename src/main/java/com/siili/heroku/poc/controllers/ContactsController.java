@@ -69,7 +69,7 @@ public class ContactsController {
 
     @RequestMapping("/status")
     public String ok() {
-        return "OK";
+        return "OK " + System.getenv().get("DYNO");
     }
 
     private static class Contact {
