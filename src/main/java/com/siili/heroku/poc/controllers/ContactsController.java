@@ -45,7 +45,7 @@ public class ContactsController {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    public ResponseEntity.BodyBuilder addContact(@RequestBody Contact contact) {
+    public ResponseEntity<Object> addContact(@RequestBody Contact contact) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 connection -> {
@@ -57,7 +57,7 @@ public class ContactsController {
                 },
                 keyHolder);
 
-        return ResponseEntity.created(URI.create(APP_URL + "/" + keyHolder.getKey().intValue()));
+        return ResponseEntity.created(URI.create(APP_URL + "/" + keyHolder.getKey().intValue())).build();
     }
 
     @RequestMapping(value = "/", method = RequestMethod.PUT)
