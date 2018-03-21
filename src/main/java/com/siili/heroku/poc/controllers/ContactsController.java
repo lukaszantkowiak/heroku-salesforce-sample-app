@@ -44,7 +44,7 @@ public class ContactsController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<URI> addContact(@RequestBody Contact contact) {
+    public ResponseEntity<Object> addContact(@RequestBody Contact contact) {
         jdbcTemplate.update(
                 INSERT_CONTACT_QUERY,
                 contact.getFirstName(), contact.getLastName(), contact.getPrivateEmail()
@@ -54,13 +54,13 @@ public class ContactsController {
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ResponseEntity<URI> updateContact(@RequestBody Contact contact) {
-        jdbcTemplate.update(
+    public ResponseEntity<Integer> updateContact(@RequestBody Contact contact) {
+        int update = jdbcTemplate.update(
                 UPDATE_CONTACT_QUERY,
                 contact.getPrivateEmail(), contact.getFirstName(), contact.getLastName()
         );
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(update);
     }
 
     @RequestMapping("/status")
