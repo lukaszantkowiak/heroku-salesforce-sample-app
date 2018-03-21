@@ -69,7 +69,7 @@ public class ContactsController {
 
     @RequestMapping("/status")
     public String ok() {
-        return "OK " + System.getenv().get("DYNO");
+        return "OK " + System.getenv().get("DYNO") + "; " + System.getenv().get("HEROKU_APP_NAME");
     }
 
     private static class Contact {
