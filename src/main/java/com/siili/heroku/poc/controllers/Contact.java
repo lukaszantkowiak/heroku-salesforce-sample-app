@@ -1,5 +1,7 @@
 package com.siili.heroku.poc.controllers;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 class Contact {
     private String firstName;
     private String lastName;
@@ -9,6 +11,7 @@ class Contact {
         return firstName;
     }
 
+    @JsonProperty("firstname")
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -17,6 +20,7 @@ class Contact {
         return lastName;
     }
 
+    @JsonProperty("lastname")
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
@@ -25,6 +29,7 @@ class Contact {
         return privateEmail;
     }
 
+    @JsonProperty("privateemail")
     public void setPrivateEmail(String privateEmail) {
         this.privateEmail = privateEmail;
     }
