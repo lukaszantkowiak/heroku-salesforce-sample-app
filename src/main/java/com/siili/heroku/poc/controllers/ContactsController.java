@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.sql.PreparedStatement;
@@ -45,7 +46,7 @@ public class ContactsController {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    public ResponseEntity<Object> addContact(@RequestBody Contact contact) {
+    public ResponseEntity<Object> addContact(@RequestBody Contact contact, UriComponentsBuilder uriComponentsBuilder) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 connection -> {
@@ -69,8 +70,8 @@ public class ContactsController {
     }
 
     @RequestMapping("/status")
-    public String ok() {
-        return "OK ";
+    public String ok(UriComponentsBuilder uriComponentsBuilder) {
+        return "OK " + uriComponentsBuilder.toUriString();
     }
 
     private static class Contact {
