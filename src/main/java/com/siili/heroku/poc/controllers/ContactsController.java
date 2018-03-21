@@ -1,20 +1,16 @@
 package com.siili.heroku.poc.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
 
@@ -44,37 +40,23 @@ public class ContactsController {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    public ResponseEntity<URI> addContact(@RequestBody Contact contact, UriComponentsBuilder uriComponentsBuilder) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
+    public ResponseEntity<URI> addContact(@RequestBody Contact contact) {
         jdbcTemplate.update(
-                connection -> {
-                    PreparedStatement ps = connection.prepareStatement(INSERT_CONTACT_QUERY, new String[]{"id"});
-                    ps.setString(1, contact.getFirstName());
-                    ps.setString(2, contact.getLastName());
-                    ps.setString(3, contact.getPrivateEmail());
-                    return ps;
-                },
-                keyHolder);
+                INSERT_CONTACT_QUERY,
+                contact.getFirstName(), contact.getLastName(), contact.getPrivateEmail()
+        );
 
-        UriComponents uriComponents = uriComponentsBuilder.path(CONTROLLER_PATH + "/{id}").buildAndExpand(keyHolder.getKey().intValue());
-        return ResponseEntity.created(uriComponents.toUri()).build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @RequestMapping(value = "/", method = RequestMethod.PUT)
-    public ResponseEntity<URI> updateContact(@RequestBody Contact contact, UriComponentsBuilder uriComponentsBuilder) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
+    public ResponseEntity<URI> updateContact(@RequestBody Contact contact) {
         jdbcTemplate.update(
-                connection -> {
-                    PreparedStatement ps = connection.prepareStatement(UPDATE_CONTACT_QUERY, new String[]{"id"});
-                    ps.setString(1, contact.getPrivateEmail());
-                    ps.setString(2, contact.getFirstName());
-                    ps.setString(3, contact.getLastName());
-                    return ps;
-                },
-                keyHolder);
+                UPDATE_CONTACT_QUERY,
+                contact.getPrivateEmail(), contact.getFirstName(), contact.getLastName()
+        );
 
-        UriComponents uriComponents = uriComponentsBuilder.path(CONTROLLER_PATH + "/{id}").buildAndExpand(keyHolder.getKey().intValue());
-        return ResponseEntity.ok(uriComponents.toUri());
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping("/status")
