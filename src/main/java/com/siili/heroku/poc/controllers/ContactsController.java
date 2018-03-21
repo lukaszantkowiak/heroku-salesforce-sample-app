@@ -18,17 +18,23 @@ public class ContactsController {
 
     @RequestMapping("/")
     public List<Map<String, Object>> getContacts() {
-        System.out.println("ContactsController.getContacts");
         return jdbcTemplate.queryForList("select firstname, lastname, private_email__c as privateemail from salesforce.Contact");
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public int addContact(@RequestBody String firstName, @RequestBody String lastName, @RequestBody String privateEmail) {
-        int update = jdbcTemplate.update(
+        return jdbcTemplate.update(
                 "INSERT INTO salesforce.Contact (firstname, lastname, private_email__c) VALUES (?, ?, ?)",
                 firstName, lastName, privateEmail
         );
-        return update;
+    }
+
+    @RequestMapping(value = "/", method = RequestMethod.PUT)
+    public int updateContact(@RequestBody String firstName, @RequestBody String lastName, @RequestBody String privateEmail) {
+        return jdbcTemplate.update(
+                "UPDATE salesforce.Contact SET private_email__c = ? WHERE firstname = ? AND lastname = ?",
+                privateEmail, firstName, lastName
+        );
     }
 
     @RequestMapping("/status")
