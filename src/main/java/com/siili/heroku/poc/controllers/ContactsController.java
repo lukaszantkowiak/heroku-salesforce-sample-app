@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -23,9 +24,6 @@ import static com.siili.heroku.poc.controllers.ContactsController.CONTROLLER_PAT
 @RequestMapping(CONTROLLER_PATH)
 public class ContactsController {
     static final String CONTROLLER_PATH = "/contacts";
-
-    private static final String APP_NAME = System.getenv().get("HEROKU_APP_NAME");
-    private static final String APP_URL = "https://" + APP_NAME + ".herokuapp.com";
 
     private static final String GET_CONTACTS_QUERY = "SELECT firstname, lastname, private_email__c AS privateemail FROM salesforce.Contact";
     private static final String GET_CONTACT_QUERY = "SELECT firstname, lastname, private_email__c AS privateemail FROM salesforce.Contact WHERE id = ?";
@@ -46,11 +44,11 @@ public class ContactsController {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    public ResponseEntity<Object> addContact(@RequestBody Contact contact, UriComponentsBuilder uriComponentsBuilder) {
+    public ResponseEntity<URI> addContact(@RequestBody Contact contact, UriComponentsBuilder uriComponentsBuilder) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 connection -> {
-                    PreparedStatement ps = connection.prepareStatement(INSERT_CONTACT_QUERY, new String[] {"id"});
+                    PreparedStatement ps = connection.prepareStatement(INSERT_CONTACT_QUERY, new String[]{"id"});
                     ps.setString(1, contact.getFirstName());
                     ps.setString(2, contact.getLastName());
                     ps.setString(3, contact.getPrivateEmail());
@@ -58,49 +56,30 @@ public class ContactsController {
                 },
                 keyHolder);
 
-        return ResponseEntity.created(URI.create(APP_URL + "/" + keyHolder.getKey().intValue())).build();
+        UriComponents uriComponents = uriComponentsBuilder.path(CONTROLLER_PATH + "/{id}").buildAndExpand(keyHolder.getKey().intValue());
+        return ResponseEntity.created(uriComponents.toUri()).build();
     }
 
     @RequestMapping(value = "/", method = RequestMethod.PUT)
-    public int updateContact(@RequestBody Contact contact) {
-        return jdbcTemplate.update(
-                UPDATE_CONTACT_QUERY,
-                contact.getPrivateEmail(), contact.getFirstName(), contact.getLastName()
-        );
+    public ResponseEntity<URI> updateContact(@RequestBody Contact contact, UriComponentsBuilder uriComponentsBuilder) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(
+                connection -> {
+                    PreparedStatement ps = connection.prepareStatement(UPDATE_CONTACT_QUERY, new String[]{"id"});
+                    ps.setString(1, contact.getPrivateEmail());
+                    ps.setString(2, contact.getFirstName());
+                    ps.setString(3, contact.getLastName());
+                    return ps;
+                },
+                keyHolder);
+
+        UriComponents uriComponents = uriComponentsBuilder.path(CONTROLLER_PATH + "/{id}").buildAndExpand(keyHolder.getKey().intValue());
+        return ResponseEntity.ok(uriComponents.toUri());
     }
 
     @RequestMapping("/status")
-    public String ok(UriComponentsBuilder uriComponentsBuilder) {
-        return "OK " + uriComponentsBuilder.toUriString();
+    public String ok() {
+        return "OK";
     }
 
-    private static class Contact {
-        private String firstName;
-        private String lastName;
-        private String privateEmail;
-
-        public String getFirstName() {
-            return firstName;
-        }
-
-        public void setFirstName(String firstName) {
-            this.firstName = firstName;
-        }
-
-        public String getLastName() {
-            return lastName;
-        }
-
-        public void setLastName(String lastName) {
-            this.lastName = lastName;
-        }
-
-        public String getPrivateEmail() {
-            return privateEmail;
-        }
-
-        public void setPrivateEmail(String privateEmail) {
-            this.privateEmail = privateEmail;
-        }
-    }
 }
