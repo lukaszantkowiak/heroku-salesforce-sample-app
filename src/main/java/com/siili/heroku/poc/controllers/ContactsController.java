@@ -21,8 +21,8 @@ import static com.siili.heroku.poc.controllers.ContactsController.CONTROLLER_PAT
 public class ContactsController {
     static final String CONTROLLER_PATH = "/contacts";
 
-    private static final String GET_CONTACTS_QUERY = "SELECT firstname, lastname, private_email__c AS privateemail FROM salesforce.Contact";
-    private static final String GET_CONTACT_QUERY = "SELECT firstname, lastname, private_email__c AS privateemail FROM salesforce.Contact WHERE id = ?";
+    private static final String GET_CONTACTS_QUERY = "SELECT id, firstname, lastname, private_email__c AS privateemail FROM salesforce.Contact";
+    private static final String GET_CONTACT_QUERY = "SELECT id, firstname, lastname, private_email__c AS privateemail FROM salesforce.Contact WHERE id = ?";
     private static final String INSERT_CONTACT_QUERY = "INSERT INTO salesforce.Contact (firstname, lastname, private_email__c) VALUES (?, ?, ?)";
     private static final String UPDATE_CONTACT_QUERY = "UPDATE salesforce.Contact SET private_email__c = ? WHERE firstname = ? AND lastname = ?";
 
