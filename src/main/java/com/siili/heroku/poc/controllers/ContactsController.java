@@ -3,7 +3,6 @@ package com.siili.heroku.poc.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,15 +11,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.Connection;
+import java.net.URI;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import static com.siili.heroku.poc.controllers.ContactsController.CONTROLLER_PATH;
+
 @RestController
-@RequestMapping("/contacts")
+@RequestMapping(CONTROLLER_PATH)
 public class ContactsController {
+    static final String CONTROLLER_PATH = "/contacts";
+
+    private static final String APP_NAME = System.getenv().get("HEROKU_APP_NAME");
+    private static final String APP_URL = "https://" + APP_NAME + ".herokuapp.com";
+
     private static final String GET_CONTACTS_QUERY = "SELECT firstname, lastname, private_email__c AS privateemail FROM salesforce.Contact";
     private static final String GET_CONTACT_QUERY = "SELECT firstname, lastname, private_email__c AS privateemail FROM salesforce.Contact WHERE id = ?";
     private static final String INSERT_CONTACT_QUERY = "INSERT INTO salesforce.Contact (firstname, lastname, private_email__c) VALUES (?, ?, ?)";
@@ -40,7 +45,7 @@ public class ContactsController {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    public int addContact(@RequestBody Contact contact) {
+    public ResponseEntity.BodyBuilder addContact(@RequestBody Contact contact) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 connection -> {
@@ -51,12 +56,8 @@ public class ContactsController {
                     return ps;
                 },
                 keyHolder);
-//        jdbcTemplate.update(
-//                "INSERT INTO salesforce.Contact (firstname, lastname, private_email__c) VALUES (?, ?, ?)",
-//                contact.getFirstName(), contact.getLastName(), contact.getPrivateEmail()
-//        );
-        return keyHolder.getKey().intValue();
-//        return ResponseEntity.created()
+
+        return ResponseEntity.created(URI.create(APP_URL + "/" + keyHolder.getKey().intValue()));
     }
 
     @RequestMapping(value = "/", method = RequestMethod.PUT)
@@ -69,7 +70,7 @@ public class ContactsController {
 
     @RequestMapping("/status")
     public String ok() {
-        return "OK " + System.getenv().get("DYNO") + " ; " + System.getenv().get("HEROKU_APP_NAME");
+        return "OK ";
     }
 
     private static class Contact {
