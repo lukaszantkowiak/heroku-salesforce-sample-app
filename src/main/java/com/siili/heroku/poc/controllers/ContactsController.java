@@ -30,13 +30,17 @@ public class ContactsController {
     private JdbcTemplate jdbcTemplate;
 
     @RequestMapping()
-    public List<Map<String, Object>> getContacts() {
-        return jdbcTemplate.queryForList(GET_CONTACTS_QUERY);
+    public ResponseEntity<List<Map<String, Object>>> getContacts() {
+        return ResponseEntity.ok(jdbcTemplate.queryForList(GET_CONTACTS_QUERY));
     }
 
     @RequestMapping("/{id}")
-    public List<Map<String, Object>> getContact(@PathVariable int id) {
-        return jdbcTemplate.queryForList(GET_CONTACT_QUERY, id);
+    public ResponseEntity<Map<String, Object>> getContact(@PathVariable int id) {
+        List<Map<String, Object>> contact = jdbcTemplate.queryForList(GET_CONTACT_QUERY, id);
+        if (contact.size() == 1) {
+            return ResponseEntity.ok(contact.get(0));
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @RequestMapping(method = RequestMethod.POST)
