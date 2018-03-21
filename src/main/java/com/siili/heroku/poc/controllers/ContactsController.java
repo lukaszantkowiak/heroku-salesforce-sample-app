@@ -2,6 +2,7 @@ package com.siili.heroku.poc.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,27 +19,57 @@ public class ContactsController {
 
     @RequestMapping("/")
     public List<Map<String, Object>> getContacts() {
-        return jdbcTemplate.queryForList("select firstname, lastname, private_email__c as privateemail from salesforce.Contact");
+        return jdbcTemplate.queryForList("SELECT firstname, lastname, private_email__c AS privateemail FROM salesforce.Contact");
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    public int addContact(@RequestParam String firstName, @RequestParam String lastName, @RequestParam String privateEmail) {
+    public int addContact(@RequestBody Contact contact) {
         return jdbcTemplate.update(
                 "INSERT INTO salesforce.Contact (firstname, lastname, private_email__c) VALUES (?, ?, ?)",
-                firstName, lastName, privateEmail
+                contact.getFirstName(), contact.getLastName(), contact.getPrivateEmail()
         );
     }
 
     @RequestMapping(value = "/", method = RequestMethod.PUT)
-    public int updateContact(@RequestParam String firstName, @RequestParam String lastName, @RequestParam String privateEmail) {
+    public int updateContact(@RequestBody Contact contact) {
         return jdbcTemplate.update(
                 "UPDATE salesforce.Contact SET private_email__c = ? WHERE firstname = ? AND lastname = ?",
-                privateEmail, firstName, lastName
+                contact.getPrivateEmail(), contact.getFirstName(), contact.getLastName()
         );
     }
 
     @RequestMapping("/status")
     public String ok() {
         return "OK";
+    }
+
+    private static class Contact {
+        private String firstName;
+        private String lastName;
+        private String privateEmail;
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public void setFirstName(String firstName) {
+            this.firstName = firstName;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
+        }
+
+        public String getPrivateEmail() {
+            return privateEmail;
+        }
+
+        public void setPrivateEmail(String privateEmail) {
+            this.privateEmail = privateEmail;
+        }
     }
 }
