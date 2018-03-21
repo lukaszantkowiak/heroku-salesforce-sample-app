@@ -29,7 +29,7 @@ public class ContactsController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @RequestMapping("/")
+    @RequestMapping()
     public List<Map<String, Object>> getContacts() {
         return jdbcTemplate.queryForList(GET_CONTACTS_QUERY);
     }
@@ -39,7 +39,7 @@ public class ContactsController {
         return jdbcTemplate.queryForList(GET_CONTACT_QUERY, id);
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<URI> addContact(@RequestBody Contact contact) {
         jdbcTemplate.update(
                 INSERT_CONTACT_QUERY,
@@ -49,7 +49,7 @@ public class ContactsController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.PUT)
+    @RequestMapping(method = RequestMethod.PUT)
     public ResponseEntity<URI> updateContact(@RequestBody Contact contact) {
         jdbcTemplate.update(
                 UPDATE_CONTACT_QUERY,
