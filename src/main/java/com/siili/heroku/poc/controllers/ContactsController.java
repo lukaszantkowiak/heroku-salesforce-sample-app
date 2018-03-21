@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class ContactsController {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    public int addContact(@RequestBody String firstName, @RequestBody String lastName, @RequestBody String privateEmail) {
+    public int addContact(@@RequestParam String firstName, @RequestParam String lastName, @RequestParam String privateEmail) {
         return jdbcTemplate.update(
                 "INSERT INTO salesforce.Contact (firstname, lastname, private_email__c) VALUES (?, ?, ?)",
                 firstName, lastName, privateEmail
@@ -30,7 +31,7 @@ public class ContactsController {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.PUT)
-    public int updateContact(@RequestBody String firstName, @RequestBody String lastName, @RequestBody String privateEmail) {
+    public int updateContact(@RequestParam String firstName, @RequestParam String lastName, @RequestParam String privateEmail) {
         return jdbcTemplate.update(
                 "UPDATE salesforce.Contact SET private_email__c = ? WHERE firstname = ? AND lastname = ?",
                 privateEmail, firstName, lastName
