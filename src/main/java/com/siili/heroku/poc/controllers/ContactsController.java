@@ -63,7 +63,7 @@ public class ContactsController {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping("/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Object> removeContact(@PathVariable int id) {
         jdbcTemplate.update(
                 REMOVE_CONTACT_QUERY,
