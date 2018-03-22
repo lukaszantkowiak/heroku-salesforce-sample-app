@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +24,7 @@ public class ContactsController {
     private static final String GET_CONTACT_QUERY = "SELECT id, firstname, lastname, private_email__c AS privateemail FROM salesforce.Contact WHERE id = ?";
     private static final String INSERT_CONTACT_QUERY = "INSERT INTO salesforce.Contact (firstname, lastname, private_email__c) VALUES (?, ?, ?)";
     private static final String UPDATE_CONTACT_QUERY = "UPDATE salesforce.Contact SET private_email__c = ? WHERE firstname = ? AND lastname = ?";
+    private static final String REMOVE_CONTACT_QUERY = "DELETE FROM salesforce.Contact WHERE id = ?";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -58,6 +58,16 @@ public class ContactsController {
         jdbcTemplate.update(
                 UPDATE_CONTACT_QUERY,
                 contact.getPrivateEmail(), contact.getFirstName(), contact.getLastName()
+        );
+
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping("/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Object> removeContact(@PathVariable int id) {
+        jdbcTemplate.update(
+                REMOVE_CONTACT_QUERY,
+                id
         );
 
         return ResponseEntity.ok().build();
